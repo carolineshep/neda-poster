@@ -1,0 +1,70 @@
+---
+title: "Poster Figures"
+author: "Caroline Shepherd"
+date: "7/19/2023"
+output:
+  html_document:
+    theme: cerulean
+    code_folding: show
+    highlight: monochrome
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
+    collapsed: yes
+    smooth_scroll: yes
+    number_sections: no
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) #this setup code chunk is always created when you make an rmarkdown (rmd). There are some options to change it, but I don't think you need to worry about that rn
+```
+
+##Step 1
+###Read in the packages
+
+```{r}
+library (vegan) #ecological package
+library (ggplot2) #package for making pretty figures
+library(here) #this package helps make code more shareable because it basically sets the working directory for you
+
+```
+
+##Step 2
+###Reading in Decomposition Tea Bag data
+
+```{r}
+#load in the data here. We're renaming the data we're reading in -> "data" to make it easier to reference later on. Using here to let R know that we're pulling from the project directory.
+data<- read.csv(here("data", "TBI_Jun_2023_Final.csv"))
+
+```
+
+
+##Step 3
+### Running ANOVAS and plotting results
+
+```{r}
+#ANOVA-decomp by treatments
+TBI.model <- lm (data$"k" ~ data$"Treatment", data = data)
+model.aov<- aov (TBI.model)
+summary (model.aov)
+#running an ANOVA model and outputting the summary at the end
+
+#creating a boxplot of decomp by treatments
+p <- ggplot(data, aes(y=k, x=Treatment, fill = Treatment))+ geom_boxplot()
+p <- p+ theme_bw() +  scale_fill_manual(values=c("#C2D6D4", "#F2E80A"))+ theme(text = element_text(colour = 'black', size = 30)) + xlab ("Treatment") + ylab ("Decomposition Rate (k)") +  theme(legend.position="none")
+p
+
+#ANOVA-decomp by treatments and round
+TBI.model.Round <- lm (data$"k" ~ data$"Treatment"* data$"Round", data = data)
+model.aov.round<- aov (TBI.model.Round)
+summary (model.aov.round)
+# running an anova model by treatments and by round, then using summary to output the results
+
+# creating a boxplot of decomp by treatments and round
+ggplot(data, aes(x=factor(Treatment), y=k, fill = factor(Round)))+ xlab ("Treatment") + ylab ("Decomposition Rate (k)") +
+  geom_boxplot()+theme_bw() + theme(text = element_text(colour = 'black', size = 30)) +  scale_fill_manual(values=c("#C2D6D4", "#F2E80A", "#A7A09A", "#3B3B3D")) + labs(fill = "Round")
+
+```
+
